@@ -7,14 +7,11 @@
  *
  * @author ferna
  */
-public class FClientes extends javax.swing.JFrame {
-    
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FClientes.class.getName());
+public class FCocinero extends javax.swing.JFrame {
 
-    /**
-     * Creates new form FClientes
-     */
-    public FClientes() {
+    Conexion cnx = new Conexion();
+
+    public FCocinero() {
         initComponents();
     }
 
@@ -60,12 +57,12 @@ public class FClientes extends javax.swing.JFrame {
                 }
             }
         } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+            
         }
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new FClientes().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new FCocinero().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

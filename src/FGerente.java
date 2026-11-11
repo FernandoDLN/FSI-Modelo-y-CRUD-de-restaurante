@@ -7,15 +7,13 @@
  *
  * @author ferna
  */
-public class FMesa extends javax.swing.JFrame {
+public class FGerente extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FMesa.class.getName());
-
-    /**
-     * Creates new form FMesa
-     */
-    public FMesa() {
+  Conexion cnx = new Conexion();
+  
+    public FGerente() {
         initComponents();
+        
     }
 
     /**
@@ -60,12 +58,12 @@ public class FMesa extends javax.swing.JFrame {
                 }
             }
         } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+            
         }
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new FMesa().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new FGerente().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

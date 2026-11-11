@@ -7,14 +7,10 @@
  *
  * @author ferna
  */
-public class FEmpleado extends javax.swing.JFrame {
+public class FCajero extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FEmpleado.class.getName());
-
-    /**
-     * Creates new form FEmpleado
-     */
-    public FEmpleado() {
+   Conexion cnx = new Conexion();
+    public FCajero() {
         initComponents();
     }
 
@@ -60,12 +56,12 @@ public class FEmpleado extends javax.swing.JFrame {
                 }
             }
         } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+            
         }
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new FEmpleado().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new FCajero().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

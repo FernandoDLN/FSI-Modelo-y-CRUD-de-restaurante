@@ -3,33 +3,22 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 import javax.imageio.ImageIO;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-import java.io.File;
-import java.util.Calendar;
-
-
-//import java.util.Map;
-//import net.sf.jasperreports.engine.JasperFillManager;
-//import net.sf.jasperreports.engine.JasperPrint;
-//import net.sf.jasperreports.engine.JasperReport;
-//import net.sf.jasperreports.engine.util.JRLoader;
-//import net.sf.jasperreports.view.JasperViewer;
-
 public class Conexion {
 
     Connection con;
 
-    //-------------------------------------------------------------------------------
     public int conectar(String servidor, String base, String usuario, String clave) {
         try {
             String url = "jdbc:mysql://" + servidor + ":3307/" + base;
@@ -41,7 +30,6 @@ public class Conexion {
             return 0;
         }
     }
-    //-------------------------------------------------------------------------------
 
     public int desconectar() {
         try {
@@ -53,111 +41,94 @@ public class Conexion {
         }
     }
 
-    
-    //--------------------------------------------------------------------------
-    //-------- Muestra el resultado de una consulta en una JTable 
-    //--------------------------------------------------------------------------
     public int entablar(String consulta, JTable malla) {
-
         int correcta = 0;
-
         try {
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(consulta);
             ResultSetMetaData rsm = rs.getMetaData();
             DefaultTableModel modelo = (DefaultTableModel) malla.getModel();
-            //limpiar tabla
+            
             modelo.setColumnCount(0);
             modelo.setRowCount(0);
 
-            //agregar las columnas del resultado con su nombre
             for (int k = 1; k <= rsm.getColumnCount(); k++) {
                 modelo.addColumn(rsm.getColumnName(k).toUpperCase());
             }
 
-            //agregar renglones con los datos
             int renglon = 0;
             while (rs.next()) {
                 modelo.insertRow(renglon, new String[rsm.getColumnCount()]);
                 for (int k = 1; k <= rsm.getColumnCount(); k++) {
-                    if (rsm.getColumnType(k) == -4) { //tipo blob de imagen
+                    if (rsm.getColumnType(k) == -4 || rsm.getColumnType(k) == 2004) { // Tipo BLOB / LONGVARBINARY
                         int w = malla.getColumnModel().getColumn(k - 1).getWidth();
                         int h = malla.getRowHeight();
                         malla.getColumnModel().getColumn(k - 1).setCellRenderer(new ImageRenderer(w, h));
-                        modelo.setValueAt(new ImageIcon(rs.getBytes(k)), renglon, k - 1);
-                    } else { //cualquier otro tipo que se puede manejar como cadena
+                        byte[] bytes = rs.getBytes(k);
+                        if (bytes != null) {
+                            modelo.setValueAt(new ImageIcon(bytes), renglon, k - 1);
+                        } else {
+                            modelo.setValueAt(null, renglon, k - 1);
+                        }
+                    } else {
                         modelo.setValueAt(rs.getString(k), renglon, k - 1);
                     }
                 }
                 renglon++;
             }
+            correcta = 1;
         } catch (SQLException ex) {
             correcta = 0;
             System.out.println(ex.getMessage());
         }
-
-        
-        
         return correcta;
-
     }
-    
-    //--------------------------------------------------------------------------
-    //-------- Muestra el resultado de una consulta en una JTable 
-    //-------- adaptando el ancho de las columnas
-    //--------------------------------------------------------------------------
+
     public int entablar(String consulta, JTable malla, double... porcentajes) {
-
         int correcta = 0;
-
         try {
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(consulta);
             ResultSetMetaData rsm = rs.getMetaData();
             DefaultTableModel modelo = (DefaultTableModel) malla.getModel();
-            //limpiar tabla
+            
             modelo.setColumnCount(0);
             modelo.setRowCount(0);
 
-            //agregar las columnas del resultado con su nombre
             for (int k = 1; k <= rsm.getColumnCount(); k++) {
                 modelo.addColumn(rsm.getColumnName(k).toUpperCase());
             }
 
-            //agregar renglones con los datos
             int renglon = 0;
             while (rs.next()) {
                 modelo.insertRow(renglon, new String[rsm.getColumnCount()]);
                 for (int k = 1; k <= rsm.getColumnCount(); k++) {
-                    if (rsm.getColumnType(k) == -4) { //tipo blob de imagen
-                        int w = malla.getColumnModel().getColumn(k-1).getWidth();
+                    if (rsm.getColumnType(k) == -4 || rsm.getColumnType(k) == 2004) {
+                        int w = malla.getColumnModel().getColumn(k - 1).getWidth();
                         int h = malla.getRowHeight();
-                        malla.getColumnModel().getColumn(k-1).setCellRenderer(new ImageRenderer(w, h));
-                        modelo.setValueAt(new ImageIcon(rs.getBytes(k)), renglon, k - 1);
-                    } else { //cualquier otro tipo que se puede manejar como cadena
+                        malla.getColumnModel().getColumn(k - 1).setCellRenderer(new ImageRenderer(w, h));
+                        byte[] bytes = rs.getBytes(k);
+                        if (bytes != null) {
+                            modelo.setValueAt(new ImageIcon(bytes), renglon, k - 1);
+                        } else {
+                            modelo.setValueAt(null, renglon, k - 1);
+                        }
+                    } else {
                         modelo.setValueAt(rs.getString(k), renglon, k - 1);
                     }
                 }
                 renglon++;
             }
             
-            //Adaptar el ancho de las columnas
             setAnchoColumnas(malla, porcentajes);
-
+            correcta = 1;
         } catch (SQLException ex) {
             correcta = 0;
             System.out.println(ex.getMessage());
         }
-
-        
-        
         return correcta;
-
     }
-    
-    //--------------------------------------------------------------------------
-    //-------- cambia el ancho de las columnas de una tabla en porcentajes
-    //--------------------------------------------------------------------------
+
     public static void setAnchoColumnas(JTable tabla, double... porcentajes) {
         double total = 0;
         int anchoTabla = tabla.getWidth();
@@ -171,19 +142,9 @@ public class Conexion {
             column.setPreferredWidth((int) (anchoTabla * (porcentajes[i] / total)));
         }
     }
-    //--------------------------------------------------------------------------
 
-    
-    
-    //--------------------------------------------------------------------------
-    //-------- regresa el valor de una consulta de un solo dato
-    //-------- si el resultado es la cadena vacia, significa que la consulta ha
-    //-------- regresado una tabla vacia o el código SQL es incorrecto
-    //--------------------------------------------------------------------------
     public String obtenerDato(String consulta) {
-
         String resultado = "";
-
         try {
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(consulta);
@@ -196,16 +157,10 @@ public class Conexion {
         }
     }
 
-    //--------------------------------------------------------------------------
-    //-------- regresa el valor de un campo que coincida con un dato dado
-    //-------- supone que el campo regresado por la consulta es único
-    //--------------------------------------------------------------------------
     public String buscarDato(String tabla, String columnaDeseada, String campoBuscado, String valorBuscado) {
         String consulta = "SELECT " + columnaDeseada + " FROM " + tabla
                 + " WHERE " + campoBuscado + " = '" + valorBuscado + "'";
-
         String resultado = "";
-
         try {
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(consulta);
@@ -218,11 +173,8 @@ public class Conexion {
         }
     }
 
-    //--------------------------------------------------------------------------
-    //-------- muestra los datos de un campo en un combobox
-    //--------------------------------------------------------------------------
     public void seleccionar(String consulta, JComboBox box) {
-        ArrayList<String> datos = new ArrayList();
+        ArrayList<String> datos = new ArrayList<>();
         try {
             Statement ps = con.createStatement();
             ResultSet rs = ps.executeQuery(consulta);
@@ -238,18 +190,14 @@ public class Conexion {
         }
     }
 
-    //--------------------------------------------------------------------------
-    //-------- regresa una lista con los registros del resultado de la consulta
-    //---------cada registro de la lista es otra lista
-    //--------------------------------------------------------------------------
     public ArrayList<ArrayList<String>> consultar(String consulta) {
-        ArrayList<ArrayList<String>> datos = new ArrayList();
+        ArrayList<ArrayList<String>> datos = new ArrayList<>();
         try {
             Statement ps = con.createStatement();
             ResultSet rs = ps.executeQuery(consulta);
             ResultSetMetaData rsm = rs.getMetaData();
             while (rs.next()) {
-                ArrayList<String> renglon = new ArrayList();
+                ArrayList<String> renglon = new ArrayList<>();
                 for (int k = 1; k <= rsm.getColumnCount(); k++) {
                     renglon.add(rs.getString(k));
                 }
@@ -258,15 +206,9 @@ public class Conexion {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        
         return datos;
     }
     
-    
-    //--------------------------------------------------------------------------
-    //-------- regresa un arreglo con los registros del resultado de la consulta
-    //---------cada registro es un arreglo
-    //--------------------------------------------------------------------------
     public String[][] consultar2Array(String consulta) {
         ArrayList<ArrayList<String>> datos = consultar(consulta);
         String[][] resultado = null;
@@ -274,135 +216,72 @@ public class Conexion {
             resultado = new String[datos.size()][];
             for (int r = 0; r < datos.size(); r++) {
                 ArrayList<String> ren = datos.get(r);
-                resultado[r] = (String[])ren.toArray();
+                resultado[r] = ren.toArray(new String[0]);
             }
         }        
         return resultado;
     }
-    
-     // <editor-fold defaultstate="collapsed" desc="Funciones para el manejo de fechas">  
-    //--------------------------------------------------------------------------
-    //-------- obtener la fechay hora del sistema
-    //--------------------------------------------------------------------------
+
     public String ObtenerFechaHora(){
         Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
-         int mHour = c.get(Calendar.HOUR_OF_DAY);
-        int mMinute = c.get(Calendar.MINUTE);
-        int mSecond = c.get(Calendar.SECOND);
-        int mMili = c.get(Calendar.MILLISECOND);
-        
-        return year+"-"+month+"-"+day+" "+mHour+":"+mMinute+":"+mSecond+"."+mMili;
+        return c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-" + c.get(Calendar.DAY_OF_MONTH) + " "
+                + c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE) + ":" + c.get(Calendar.SECOND) + "." + c.get(Calendar.MILLISECOND);
     }
         
-    //--------------------------------------------------------------------------
-    //-------- obtener la fecha del sistema
-    //--------------------------------------------------------------------------
     public String ObtenerFecha(){
         Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
-         
-        
-        return year+"-"+month+"-"+day;
+        return c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-" + c.get(Calendar.DAY_OF_MONTH);
     }    
     
-    //--------------------------------------------------------------------------
-    //-------- obtener la hora del sistema
-    //--------------------------------------------------------------------------
     public String ObtenerHora(){
         Calendar c = Calendar.getInstance();
-        int mHour = c.get(Calendar.HOUR_OF_DAY);
-        int mMinute = c.get(Calendar.MINUTE);
-        int mSecond = c.get(Calendar.SECOND);
-        int mMili = c.get(Calendar.MILLISECOND);
-        
-        return mHour+":"+mMinute+":"+mSecond+"."+mMili;
+        return c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE) + ":" + c.get(Calendar.SECOND) + "." + c.get(Calendar.MILLISECOND);
     }
-        
-    //</editor-fold>
 
-    
-    // <editor-fold defaultstate="collapsed" desc="Codigo para manejo de reportes">  
-    //--------------------------------------------------------------------------
-    //-------- ejecuta un reporte jasper
-    //--------------------------------------------------------------------------
-//    public int ejecutarReporte(String archivo, Map parametro) {
-//        try {
-//            JasperReport masterReport = (JasperReport) JRLoader.loadObject(new File(archivo));
-//            JasperPrint jasperPrint = JasperFillManager.fillReport(masterReport, parametro, con);
-//            JasperViewer jviewer = new JasperViewer(jasperPrint, false);
-//            jviewer.setVisible(true);
-//            return 1;
-//        } catch (Exception j) {
-//            System.out.println("ERROR: "+j.getMessage());
-//           return 0;
-//        }
-//    } 
-    // </editor-fold>
-
-    
-    // <editor-fold defaultstate="collapsed" desc="Codigo para manejo de imágenes">  
-    
-    //--------------------------------------------------------------------------
-    //-------- obtiene los bytes de un ImageIcon
-    //--------------------------------------------------------------------------
-    public FileInputStream ImagenBytes(ImageIcon imagen) {
-        FileInputStream res = null;
-        javax.swing.JFrame f = new javax.swing.JFrame();
-        BufferedImage buff = null;
-
+    // --------------------------------------------------------------------------
+    // Método corregido: Convierte ImageIcon a Stream en memoria usando PNG
+    // --------------------------------------------------------------------------
+    public InputStream ImagenBytes(ImageIcon imagen) {
+        if (imagen == null) return null;
         try {
-            Image img = imagen.getImage();
-            buff = new BufferedImage(imagen.getIconWidth(), imagen.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+            BufferedImage buff = new BufferedImage(
+                imagen.getIconWidth(), 
+                imagen.getIconHeight(), 
+                BufferedImage.TYPE_INT_ARGB
+            );
 
-            Graphics2D ig2 = buff.createGraphics();
-            ig2.drawImage(img, 0, 0, f);
+            Graphics2D g2d = buff.createGraphics();
+            g2d.drawImage(imagen.getImage(), 0, 0, null);
+            g2d.dispose();
 
-            File directorio = new File("c:\\tempo");
-            directorio.mkdirs();
-            String nombre = "c:\\tempo\\auxiliar.jpg";
-            ImageIO.write(buff, "JPEG", new File(nombre));
-            res = new FileInputStream(new File(nombre));
-        } catch (IOException ex) {
-            System.out.println(ex.toString());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(buff, "png", baos); // "png" para preservar la transparencia y evitar excepciones de I/O
+            return new ByteArrayInputStream(baos.toByteArray());
+        } catch (Exception ex) {
+            System.out.println("Error al convertir imagen a bytes: " + ex.getMessage());
+            return null;
         }
-        return res;
     }
 
-    //--------------------------------------------------------------------------
-    //-------- cambia el tamaño de una imagen
-    //--------------------------------------------------------------------------
     public static Image escalarImagen(Image srcImg, int ancho, int alto) {
+        if (srcImg == null) return null;
         BufferedImage imagenEscalada = new BufferedImage(ancho, alto, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = imagenEscalada.createGraphics();
-
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g2.drawImage(srcImg, 0, 0, ancho, alto, null);
         g2.dispose();
-
         return imagenEscalada;
     }
-
 }
 
-//------------------------------------------------------------------------------
-//---- Clase para manejar imagenes en las celdas de una JTable
-//------------------------------------------------------------------------------
 class ImageRenderer extends DefaultTableCellRenderer {
-
     JLabel lbl = new JLabel();
-    ImageIcon icon;
     int ancho, alto;
 
     public ImageRenderer(int ancho, int alto) {
         lbl.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         this.ancho = ancho;
         this.alto = alto;
-
     }
 
     @Override
@@ -410,16 +289,18 @@ class ImageRenderer extends DefaultTableCellRenderer {
             boolean hasFocus, int row, int column) {
         if (value instanceof String) {
             lbl.setText((String) value);
+            lbl.setIcon(null);
         } else if (value instanceof ImageIcon) {
-            ImageIcon nueva = new ImageIcon(Conexion.escalarImagen(((ImageIcon) value).getImage(), ancho, alto));
-            lbl.setIcon(nueva);
+            ImageIcon orig = (ImageIcon) value;
+            if (orig.getImage() != null) {
+                ImageIcon nueva = new ImageIcon(Conexion.escalarImagen(orig.getImage(), ancho, alto));
+                lbl.setIcon(nueva);
+                lbl.setText("");
+            }
+        } else {
+            lbl.setIcon(null);
+            lbl.setText("");
         }
         return lbl;
     }
-    
-
-}// </editor-fold>
-
-
-
-//-----------------------------------------------------------------------------------------------
+}

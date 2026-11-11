@@ -1,27 +1,28 @@
-import java.sql.*;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 
 public class Alimentos {
 
-    static String todos = "SELECT * FROM alimentos ORDER BY nombre DESC";
-    static String ids = "SELECT idalimentos FROM alimentos ORDER BY idalimentos";
-    
-    int idalimentos;
-    String nombre, descripcion, categoria, estado;
-    float precio;
-    byte[] foto;
+    static String todos = "SELECT * FROM alimentos ORDER BY idalimentos";
+    static String idalimentos = "SELECT idalimentos FROM alimentos ORDER BY idalimentos";
+
+    String id_alimentos, nombre, descripcion, precio, foto, categoria, estado;
 
     public Alimentos() {
 
     }
 
-    public Alimentos(int idalimentos, String nombre, String descripcion, float precio, byte[] foto, String categoria, String estado) {
-        this.idalimentos = idalimentos;
+    public Alimentos(String id_alimentos, String nombre, String descripcion, String precio, String foto, String categoria, String estado) {
+
+        this.id_alimentos = id_alimentos;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.precio = precio;
         this.foto = foto;
         this.categoria = categoria;
         this.estado = estado;
+
     }
 
     public int insertar(Connection con) {
@@ -29,17 +30,17 @@ public class Alimentos {
         try {
             String sql = "INSERT INTO alimentos VALUES(?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement ps = con.prepareStatement(sql);
-
-            ps.setInt(1, idalimentos);
+            ps.setString(1, id_alimentos);
             ps.setString(2, nombre);
             ps.setString(3, descripcion);
-            ps.setFloat(4, precio);
-            ps.setBytes(5, foto);
+            ps.setString(4, precio);
+            ps.setString(5, foto);
             ps.setString(6, categoria);
             ps.setString(7, estado);
             return ps.executeUpdate();
+
         } catch (Exception e) {
-            System.out.println("ERROR: " + e.getMessage());
+            System.out.println("Errror:" + e.getLocalizedMessage());
             return resultado;
         }
     }
@@ -47,12 +48,13 @@ public class Alimentos {
     public int borrar(Connection con) {
         int resultado = 0;
         try {
-            String sql = "DELETE FROM alimentos WHERE idalimentos = ?";
+            String sql = "DELETE FROM alimentos WHERE idalimentos =?";
             PreparedStatement ps = con.prepareStatement(sql);
-            ps.setInt(1, idalimentos);
+            ps.setString(1, id_alimentos);
             return ps.executeUpdate();
+
         } catch (Exception e) {
-            System.out.println("ERROR: " + e.getMessage());
+            System.out.println("Error: " + e.getMessage());
             return resultado;
         }
     }
@@ -60,19 +62,20 @@ public class Alimentos {
     public int actualizar(Connection con) {
         int resultado = 0;
         try {
-            String sql = "UPDATE alimentos SET nombre = ?, descripcion = ?, precio = ?, foto = ?, categoria = ?, estado = ? WHERE idalimentos = ?";
+            String sql = "UPDATE alimentos SET nombre = ?, descripcion = ?, precio = ?, foto = ?, categoria = ?, estado =? WHERE idalimentos = ?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, nombre);
             ps.setString(2, descripcion);
-            ps.setFloat(3, precio);
-            ps.setBytes(4, foto);
+            ps.setString(3, precio);
+            ps.setString(4, foto);
             ps.setString(5, categoria);
             ps.setString(6, estado);
-            ps.setInt(7, idalimentos);
+            ps.setString(7, id_alimentos);
 
             return ps.executeUpdate();
+
         } catch (Exception e) {
-            System.out.println("ERROR: " + e.getMessage());
+            System.out.println("Error: " + e.getMessage());
             return resultado;
         }
     }

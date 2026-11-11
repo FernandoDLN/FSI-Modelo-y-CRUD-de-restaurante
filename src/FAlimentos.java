@@ -1,14 +1,23 @@
+
+import java.io.File;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-
 /**
  *
  * @author ferna
  */
 public class FAlimentos extends javax.swing.JFrame {
-    
+
+    Conexion cnx;
+    ImageIcon cartel;
+    ImageIcon icono = new ImageIcon(getClass().getResource(""));
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FAlimentos.class.getName());
 
     /**
@@ -16,6 +25,22 @@ public class FAlimentos extends javax.swing.JFrame {
      */
     public FAlimentos() {
         initComponents();
+
+        setTitle("ALIMENTOS-MENU");
+
+        setLocationRelativeTo(null);
+        setIconImage(icono.getImage());
+        TConsulta.setRowHeight(130);
+
+        cnx = new Conexion();
+
+        if (cnx.conectar("localhost", "fondatel", "root", "") == 1) {
+            cnx.entablar("SELECT * FROM alimentos", TConsulta, 8, 20, 25, 10, 20, 10, 7);
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Error");
+            System.exit(0);
+        }
     }
 
     /**
@@ -27,22 +52,208 @@ public class FAlimentos extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jButton2 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        txtNombre = new javax.swing.JTextField();
+        txtClave = new javax.swing.JTextField();
+        btnFoto = new javax.swing.JButton();
+        JCartel = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        TConsulta = new javax.swing.JTable();
+        jLabel4 = new javax.swing.JLabel();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+        des = new javax.swing.JLabel();
+        preciol = new javax.swing.JLabel();
+        estado = new javax.swing.JLabel();
+        CATEGORIA = new javax.swing.JLabel();
+
+        jButton2.setText("jButton2");
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jLabel1.setText("CLAVE");
+
+        jLabel2.setText("Nombre");
+
+        txtNombre.setText("jTextField1");
+
+        txtClave.setText("jTextField1");
+
+        btnFoto.setText("FOTO");
+        btnFoto.addActionListener(this::btnFotoActionPerformed);
+
+        JCartel.setText("jLabel3");
+
+        TConsulta.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        TConsulta.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                TConsultaMousePressed(evt);
+            }
+        });
+        jScrollPane1.setViewportView(TConsulta);
+
+        jLabel4.setText("MENU");
+
+        jButton3.setText("REGISTRAR MENU");
+        jButton3.addActionListener(this::jButton3ActionPerformed);
+
+        jButton4.setText("CANCELAR");
+
+        des.setText("DESCRIPCION:");
+
+        preciol.setText("PRECIO:");
+
+        estado.setText("ESTADO:");
+
+        CATEGORIA.setText("CATEGORIA:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtClave, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(79, 79, 79)
+                        .addComponent(jLabel4)
+                        .addGap(42, 42, 42)
+                        .addComponent(jButton3)
+                        .addGap(44, 44, 44)
+                        .addComponent(jButton4))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(JCartel, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(jLabel2)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(43, 43, 43)
+                                .addComponent(btnFoto)))
+                        .addGap(53, 53, 53)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(0, 92, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(CATEGORIA, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(des, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(preciol, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(estado, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(56, 56, 56))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1)
+                            .addComponent(txtClave, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(40, 40, 40)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel4)
+                            .addComponent(jButton3)
+                            .addComponent(jButton4))))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(4, 4, 4)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(25, 137, Short.MAX_VALUE)
+                        .addComponent(JCartel, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(33, 33, 33)
+                        .addComponent(btnFoto))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(des, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(preciol, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(estado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(CATEGORIA, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnFotoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFotoActionPerformed
+        JFileChooser fc = new JFileChooser(System.getProperty("user.dir")); 
+        if(fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION){
+                File archivo = fc.getSelectedFile();
+                cartel = new ImageIcon(archivo.getPath()); //c:documento
+                JCartel.setIcon(new ImageIcon(cnx.escalarImagen(cartel.getImage(), 194, 235)));
+        }
+    }//GEN-LAST:event_btnFotoActionPerformed
+
+    private void TConsultaMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TConsultaMousePressed
+       int ren = TConsulta.getSelectedRow();
+       DefaultTableModel modelo = (DefaultTableModel) TConsulta.getModel();
+       if (ren >=0){
+           txtClave.setText(modelo.getValueAt(ren, 0).toString());
+           txtNombre.setText(modelo.getValueAt(ren, 1).toString());
+           des.setText(modelo.getValueAt(ren, 2).toString());
+           preciol.setText(modelo.getValueAt(ren, 3).toString());
+           cartel = new ImageIcon(cnx.escalarImagen(((ImageIcon)modelo.getValueAt(ren, 4)).getImage(), 194,235));
+           CATEGORIA.setText(modelo.getValueAt(ren, 5).toString());
+           estado.setText(modelo.getValueAt(ren, 6).toString());
+           JCartel.setIcon(cartel);
+       }
+    }//GEN-LAST:event_TConsultaMousePressed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+               String cla = txtClave.getText();
+        String tit = txtNombre.getText();
+        String descripcionText = des.getText();
+        des.setText("");
+        String pre = preciol.getText();
+        ImageIcon car = cartel;
+        String cat = CATEGORIA.getText();
+        String est = estado.getText();
+        
+        FMenu menu = new FMenu(cla, tit, descripcionText, pre, car, cat, est);
+        if (menu.insertar(cnx)== 1){
+            cnx.entablar("SELECT * FROM alimentos", TConsulta,  8, 20, 25, 10, 20, 10, 7);
+        }else{
+            JOptionPane.showMessageDialog(this, "no se pudo registrar el alimento");
+        }
+        txtClave.setText("");
+        txtNombre.setText("");
+        des.setText("");
+        preciol.setText("");
+        JCartel.setIcon(null);
+        if (cartel == null) {
+    JOptionPane.showMessageDialog(this, "SELECCIONA IMAGEN");
+    return;
+}
+        CATEGORIA.setText("");
+        estado.setText("");
+    }//GEN-LAST:event_jButton3ActionPerformed
+    
     /**
      * @param args the command line arguments
      */
@@ -69,5 +280,21 @@ public class FAlimentos extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel CATEGORIA;
+    private javax.swing.JLabel JCartel;
+    private javax.swing.JTable TConsulta;
+    private javax.swing.JButton btnFoto;
+    private javax.swing.JLabel des;
+    private javax.swing.JLabel estado;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel preciol;
+    private javax.swing.JTextField txtClave;
+    private javax.swing.JTextField txtNombre;
     // End of variables declaration//GEN-END:variables
 }
